@@ -34,6 +34,11 @@ var list_data = {
 		first : 650,
 		last : 721
 	},
+	gen7 : {
+		id : 7,
+		first : 722,
+		last : 809
+	},
 	test: {
 		id : 7,
 		first : 1,
@@ -60,14 +65,14 @@ function loadImage(index) {
 		document.getElementById('settings').style.display = 'inline-block';
 		return;
 	}
-	
+
 	var _tmpImage = new Image();
 	_tmpImage.onload = function() {
-		
+
 		//update progress bar
 		var _percentageNode = document.getElementById('percentage').querySelector('span');
 		var _fillNode = document.getElementById('percentage-fill');
-		
+
 		_percentageNode.innerText = index/maxPokemon*100;
 		_fillNode.style.width = ''+index/maxPokemon*100+'%';
 		loadImage(index + 1);
@@ -88,11 +93,11 @@ function getPokemonList() {
 	if(TESTING) {
 		return createIntegerArray(list_data.test.first, list_data.test.last);
 	}
-	
+
 	if(document.getElementById('gen-all').checked) {
 		return createIntegerArray(list_data.all.first, list_data.all.last);
 	}
-	
+
 	var list = [];
 	var inputs = document.getElementsByClassName('gen-checkbox');
 	//add each generation that is checked to the list
@@ -100,11 +105,11 @@ function getPokemonList() {
 		if(inputs[i].checked) {
 			var generation = inputs[i].value;
 			var dataObj = list_data['gen'+generation];
-			
+
 			list = list.concat(createIntegerArray(dataObj.first, dataObj.last));
 		}
 	}
-	
+
 	return list;
 }
 
@@ -117,9 +122,9 @@ initilizeGame = function() {
 	//set event handelers
 	var nodes = document.getElementsByClassName('egg');
 	for(i = 0; i < nodes.length; i++) {
-		nodes[i].onclick = startGame;	
+		nodes[i].onclick = startGame;
 	}
-	
+
 	document.getElementById('gen-all').onchange = function(e) {
 		nodes = document.getElementsByClassName('gen-checkbox');
 
@@ -134,7 +139,7 @@ initilizeGame = function() {
 			}
 		}
 	}
-	
+
 	document.getElementById('button-skip').onclick = skip;
 	document.getElementById('button-undo').onclick = undo;
 	document.getElementById('button-reset').onclick = resetGame;
@@ -153,7 +158,7 @@ displayPokemon = function() {
 		if(TESTING)
 			console.log(pokemonList[i]);
 	}
-	
+
 }
 
 skip = function() {
@@ -164,33 +169,33 @@ skip = function() {
 
 undo = function() {
 		/* remove most recent node from undoList
-		
+
 	   check if the savedChoice id number matches the randomly generated
 	   number for either choice
 			if it does, then do not add the matchingChoice back into the list
 			otherwise, add both currentChoices into the list
-	
+
 		next update the src of each location's choice
-	
+
 		check if we are at the top 10 choices and update that number as well
-		
+
 		update elminated text
-		
+
 		check if we need to disable the undo button (list is null)
 	*/
 	var _history = undoArray.pop();
 	var _pkm1 = document.querySelector('#pkm1 img');
 	var _pkm2 = document.querySelector('#pkm2 img');
-	
+
 	_history.saved = _history[1];
 	_history.deleted = _history[0];
-	
+
 	//check if we need to remove the saved pokemon from the array (to prevent duplicates)
 	if(_history.saved.value != _pkm1.getAttribute('dexnumber') &&
 	   _history.saved.value != _pkm2.getAttribute('dexnumber')) {
 	   pokemonList.splice(pokemonList.indexOf(_history.saved.value), 1);
 	}
-	
+
 	//check if we need to add the currently displayed pokemon back into the array
 	if(_history.saved.value != _pkm1.getAttribute('dexnumber') &&
 		_history.deleted.value != _pkm1.getAttribute('dexnumber')) {
@@ -200,18 +205,18 @@ undo = function() {
 		_history.deleted.value != _pkm2.getAttribute('dexnumber')) {
 		pokemonList.push(_pkm2.getAttribute('dexnumber'));
 	}
-  
+
 
    //update the top 10 grid
    if(pokemonList.length + 1 <= topGridImgArray.length)
 	{
 		topGridImgArray[pokemonList.length].src = 'images/fill.png';
 	}
-   
+
    //update the eliminated count
    document.querySelector('#choice span#remaining').innerText = maxPokemon - pokemonList.length - 2;
-   
-   
+
+
    //pokemonList, etc. should be ready now, so let's update the pokemon
    document.querySelector('#' + _history.saved.sourceId + ' img').src = 'images/'+_history.saved.value + '.png';
    document.querySelector('#' + _history.saved.sourceId + ' img').setAttribute('dexnumber', _history.saved.value);
@@ -219,10 +224,10 @@ undo = function() {
    document.querySelector('#' + _history.deleted.sourceId + ' img').src = 'images/'+_history.deleted.value + '.png';
    document.querySelector('#' + _history.deleted.sourceId + ' img').setAttribute('dexnumber', _history.deleted.value);
    document.querySelector('#' + _history.deleted.sourceId + ' img').title = _history.deleted.value;
-   
+
    if(undoArray.length == 0)
    		document.getElementById('button-undo').disabled = true;
-   
+
    if(TESTING) {
 	   console.log('action: undo pressed');
 	   console.log(_history.deleted.value + '  ' + _history.saved.value);
@@ -233,21 +238,21 @@ undo = function() {
 startGame = function() {
 	//generate the pokemon list we will use.
 	pokemonList = getPokemonList();
-	
+
 	//show the playing board
 	document.getElementById('settings').style.display = 'none';
 	document.getElementById('grid').style.display = 'block';
 	document.getElementById('button-reset').style.display = 'block';
-	
+
 	//update the maximum pokemon number
 	maxPokemon = pokemonList.length;
 	document.querySelector('#choice span#total').innerText = maxPokemon;
 	//update the minimum pokemon number
 	document.querySelector('#choice span#remaining').innerText = maxPokemon - pokemonList.length;
-	
+
 	//set the eggs to two random pokemon
 	generatePokemon(document.querySelector('#pkm1 img'), false);
-	
+
 	//enable the skip and undo buttons
 	document.getElementById('button-skip').removeAttribute('disabled');
 }
@@ -280,17 +285,17 @@ resetGame = function() {
 */
 var undoArray = [];
 
-generatePokemon = function(callLocation, updateUndo) {	
-	
+generatePokemon = function(callLocation, updateUndo) {
+
 	var uncalledLocation;
-	
-	if(callLocation.parentNode.id == 'pkm1') 
+
+	if(callLocation.parentNode.id == 'pkm1')
 		uncalledLocation = document.querySelector('#pkm2 img');
 	else if(callLocation.parentNode.id == 'pkm2') {
 		uncalledLocation = document.querySelector('#pkm1 img');
 	}
-	
-	
+
+
 	//update the undo list
 	if(updateUndo) {
 		var unlikedPkm = {
@@ -298,47 +303,47 @@ generatePokemon = function(callLocation, updateUndo) {
 			action: 'delete',
 			sourceId: uncalledLocation.parentNode.id
 		};
-		
+
 		var likedPkm = {
 			value: callLocation.getAttribute('dexnumber'),
 			action: 'save',
-			sourceId: callLocation.parentNode.id	
+			sourceId: callLocation.parentNode.id
 		};
-		
+
 		undoArray.push([unlikedPkm, likedPkm]);
 	} else {
 		callLocation.className = '';
 		uncalledLocation.className ='';
 	}
-	
+
 	//need to update the top list before changing the displayed src
 	if(pokemonList.length + 1 <= topGridImgArray.length)
 	{
 		topGridImgArray[pokemonList.length].src = uncalledLocation.src;
 	}
-	
+
 	if(pokemonList.length > 0) {
-		
+
 		var pkmId = Array.removeRandom(pokemonList);
-		
+
 		//add the liked pokemon back into the list
 		if(callLocation.getAttribute('dexnumber')) {
 			pokemonList.push(callLocation.getAttribute('dexnumber'));
 		}
-		
+
 		//update pkm1 and pkm2
-		callLocation.src = 'images/' + pkmId + '.png';
+		callLocation.src = 'images/' + pkmId + '.jpg';
 		callLocation.setAttribute('dexnumber', pkmId);
 		callLocation.onclick = function(e) { generatePokemon(this, true); };
 		callLocation.title = callLocation.getAttribute('dexnumber');
-		
+
 		pkmId = Array.removeRandom(pokemonList);
-		
+
 		uncalledLocation.src = 'images/' + pkmId + '.png';
 		uncalledLocation.setAttribute('dexnumber', pkmId);
 		uncalledLocation.onclick = function(e) { generatePokemon(this, true); };
 		uncalledLocation.title = uncalledLocation.getAttribute('dexnumber');
-		
+
 		//update pokemon remaining
 		document.querySelector('#choice span#remaining').innerText = maxPokemon - pokemonList.length - 2;
 		if(TESTING) {
@@ -353,10 +358,10 @@ generatePokemon = function(callLocation, updateUndo) {
 		uncalledLocation.className = 'hidden';
 		document.querySelector('#choice span#remaining').innerText = maxPokemon;
 	}
-	
+
 	if(document.getElementById('button-undo').disabled && undoArray.length > 0)
 		document.getElementById('button-undo').disabled = false;
-	
+
 }
 
 document.body.onload = initilizeGame();
