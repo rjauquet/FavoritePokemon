@@ -1,3 +1,4 @@
+import os
 import requests
 import shutil
 from bs4 import BeautifulSoup
@@ -11,6 +12,11 @@ for row in table.find_all('tr'):
     if columns:
         number = columns[0].get_text()
         name = columns[1].get_text().lower()
+        path = f'images/{number}.jpg'
+        # skip alt forms for now
+        if os.path.exists(path):
+            print(f'{name} already exists')
+            continue
         url = f"https://pokemondb.net{columns[1].find('a')['href']}"
         pokemon_page = requests.get(url)
         if pokemon_page.status_code == 200:
@@ -20,7 +26,6 @@ for row in table.find_all('tr'):
             except Exception as exc:
                 continue
             if pokemon_image.status_code == 200:
-                path = f'images/{number}_{name}.jpg'
                 print(path)
                 with open(path, 'wb') as outf:
                     shutil.copyfileobj(pokemon_image.raw, outf)
