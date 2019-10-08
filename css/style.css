@@ -39,7 +39,7 @@ body {
 	width:0%
 }
 #game img {
-	height:96px;
+	height:float;
 	width:96px;
 }
 #grid {
